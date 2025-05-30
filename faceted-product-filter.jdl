@@ -1,0 +1,37 @@
+```jdl
+entity Category {
+  name String required maxlength(50) unique
+  description String maxlength(255)
+}
+
+entity Product {
+  name String required maxlength(100)
+  description String TextBlob
+  price BigDecimal required min(0)
+  imageUrl String maxlength(255)
+  rating Double min(0) max(5)
+}
+
+enum Rating {
+  ONE,
+  TWO,
+  THREE,
+  FOUR,
+  FIVE
+}
+
+relationship ManyToOne {
+  Product{category(name) required} to Category
+}
+
+with builtInEntity
+relationship ManyToOne {
+  Product{user(login)} to User
+}
+
+service Product with serviceClass
+service Category with serviceClass
+
+paginate Product with pagination
+paginate Category with pagination
+```

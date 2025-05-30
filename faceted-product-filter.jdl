@@ -1,4 +1,3 @@
-```jdl
 entity Category {
   name String required maxlength(50) unique
   description String maxlength(255)
@@ -6,7 +5,7 @@ entity Category {
 
 entity Product {
   name String required maxlength(100)
-  description String TextBlob
+  description TextBlob
   price BigDecimal required min(0)
   imageUrl String maxlength(255)
   rating Double min(0) max(5)
@@ -23,10 +22,8 @@ enum Rating {
 relationship ManyToOne {
   Product{category(name) required} to Category
 }
-
-with builtInEntity
 relationship ManyToOne {
-  Product{user(login)} to User
+  Product{user(login)} to User with builtInEntity
 }
 
 service Product with serviceClass
@@ -34,4 +31,3 @@ service Category with serviceClass
 
 paginate Product with pagination
 paginate Category with pagination
-```

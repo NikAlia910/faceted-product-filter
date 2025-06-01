@@ -3,9 +3,17 @@ import axios from 'axios';
 import { configureStore } from '@reduxjs/toolkit';
 import sinon from 'sinon';
 
-import { EntityState } from 'app/shared/reducers/reducer.utils';
 import { IProduct, defaultValue } from 'app/shared/model/product.model';
-import reducer, { createEntity, deleteEntity, getEntities, getEntity, partialUpdateEntity, reset, updateEntity } from './product.reducer';
+import reducer, {
+  createEntity,
+  deleteEntity,
+  getEntities,
+  getEntity,
+  partialUpdateEntity,
+  reset,
+  updateEntity,
+  ExtendedEntityState,
+} from './product.reducer';
 
 describe('Entities reducer tests', () => {
   function isEmpty(element): boolean {
@@ -15,7 +23,7 @@ describe('Entities reducer tests', () => {
     return Object.keys(element).length === 0;
   }
 
-  const initialState: EntityState<IProduct> = {
+  const initialState: ExtendedEntityState = {
     loading: false,
     errorMessage: null,
     entities: [],
@@ -23,6 +31,10 @@ describe('Entities reducer tests', () => {
     totalItems: 0,
     updating: false,
     updateSuccess: false,
+    filters: {},
+    isFiltering: false,
+    filteredEntities: [],
+    filteredTotalItems: 0,
   };
 
   function testInitialState(state) {
@@ -119,6 +131,7 @@ describe('Entities reducer tests', () => {
         loading: false,
         totalItems: payload.headers['x-total-count'],
         entities: payload.data,
+        isFiltering: false,
       });
     });
 

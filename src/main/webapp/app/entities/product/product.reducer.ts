@@ -1,10 +1,24 @@
 import axios from 'axios';
-import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, isFulfilled, isPending } from '@reduxjs/toolkit';
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { EntityState, IQueryParams, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
+import { EntityState, IQueryParams, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IProduct, defaultValue } from 'app/shared/model/product.model';
 
-const initialState: EntityState<IProduct> = {
+export interface IProductFilters {
+  minPrice?: number;
+  maxPrice?: number;
+  categoryIds?: number[];
+  minRating?: number;
+}
+
+export interface ExtendedEntityState extends EntityState<IProduct> {
+  filters: IProductFilters;
+  isFiltering: boolean;
+  filteredEntities: IProduct[];
+  filteredTotalItems: number;
+}
+
+const initialState: ExtendedEntityState = {
   loading: false,
   errorMessage: null,
   entities: [],
@@ -12,6 +26,10 @@ const initialState: EntityState<IProduct> = {
   updating: false,
   totalItems: 0,
   updateSuccess: false,
+  filters: {},
+  isFiltering: false,
+  filteredEntities: [],
+  filteredTotalItems: 0,
 };
 
 const apiUrl = 'api/products';
@@ -22,6 +40,26 @@ export const getEntities = createAsyncThunk(
   'product/fetch_entity_list',
   async ({ page, size, sort }: IQueryParams) => {
     const requestUrl = `${apiUrl}?${sort ? `page=${page}&size=${size}&sort=${sort}&` : ''}cacheBuster=${new Date().getTime()}`;
+    return axios.get<IProduct[]>(requestUrl);
+  },
+  { serializeError: serializeAxiosError },
+);
+
+export const getFilteredEntities = createAsyncThunk(
+  'product/fetch_filtered_entity_list',
+  async ({ page, size, sort, filters }: IQueryParams & { filters: IProductFilters }) => {
+    const params = new URLSearchParams();
+    if (page !== undefined) params.append('page', page.toString());
+    if (size !== undefined) params.append('size', size.toString());
+    if (sort) params.append('sort', sort);
+    if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
+    if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
+    if (filters.categoryIds && filters.categoryIds.length > 0) {
+      params.append('categoryIds', filters.categoryIds.join(','));
+    }
+    if (filters.minRating !== undefined) params.append('minRating', filters.minRating.toString());
+
+    const requestUrl = `${apiUrl}/filter?${params.toString()}&cacheBuster=${new Date().getTime()}`;
     return axios.get<IProduct[]>(requestUrl);
   },
   { serializeError: serializeAxiosError },
@@ -79,9 +117,21 @@ export const deleteEntity = createAsyncThunk(
 
 // slice
 
-export const ProductSlice = createEntitySlice({
+export const ProductSlice = createSlice({
   name: 'product',
   initialState,
+  reducers: {
+    setFilters(state, action) {
+      state.filters = action.payload;
+    },
+    clearFilters(state) {
+      state.filters = {};
+      state.isFiltering = false;
+      state.filteredEntities = [];
+      state.filteredTotalItems = 0;
+    },
+    reset: () => initialState,
+  },
   extraReducers(builder) {
     builder
       .addCase(getEntity.fulfilled, (state, action) => {
@@ -91,17 +141,29 @@ export const ProductSlice = createEntitySlice({
       .addCase(deleteEntity.fulfilled, state => {
         state.updating = false;
         state.updateSuccess = true;
-        state.entity = {};
+        state.entity = defaultValue;
+      })
+      .addCase(getFilteredEntities.fulfilled, (state, action) => {
+        const { data, headers } = action.payload;
+        state.loading = false;
+        state.isFiltering = true;
+        state.filteredEntities = data;
+        state.filteredTotalItems = parseInt(headers['x-total-count'] || '0', 10);
+      })
+      .addCase(getFilteredEntities.pending, state => {
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(getFilteredEntities.rejected, (state, action) => {
+        state.loading = false;
+        state.errorMessage = action.error.message || 'Failed to fetch filtered products';
       })
       .addMatcher(isFulfilled(getEntities), (state, action) => {
         const { data, headers } = action.payload;
-
-        return {
-          ...state,
-          loading: false,
-          entities: data,
-          totalItems: parseInt(headers['x-total-count'], 10),
-        };
+        state.loading = false;
+        state.entities = data;
+        state.totalItems = parseInt(headers['x-total-count'] || '0', 10);
+        state.isFiltering = false;
       })
       .addMatcher(isFulfilled(createEntity, updateEntity, partialUpdateEntity), (state, action) => {
         state.updating = false;
@@ -122,7 +184,7 @@ export const ProductSlice = createEntitySlice({
   },
 });
 
-export const { reset } = ProductSlice.actions;
+export const { reset, setFilters, clearFilters } = ProductSlice.actions;
 
 // Reducer
 export default ProductSlice.reducer;

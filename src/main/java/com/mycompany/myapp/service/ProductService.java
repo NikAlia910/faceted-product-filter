@@ -2,6 +2,8 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Product;
 import com.mycompany.myapp.repository.ProductRepository;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +101,34 @@ public class ProductService {
      */
     public Page<Product> findAllWithEagerRelationships(Pageable pageable) {
         return productRepository.findAllWithEagerRelationships(pageable);
+    }
+
+    /**
+     * Get filtered products based on criteria.
+     *
+     * @param pageable the pagination information.
+     * @param minPrice the minimum price filter (optional).
+     * @param maxPrice the maximum price filter (optional).
+     * @param categoryIds the category IDs to filter by (optional).
+     * @param minRating the minimum rating filter (optional).
+     * @return the list of filtered entities.
+     */
+    @Transactional(readOnly = true)
+    public Page<Product> findFilteredProducts(
+        Pageable pageable,
+        BigDecimal minPrice,
+        BigDecimal maxPrice,
+        List<Long> categoryIds,
+        Double minRating
+    ) {
+        LOG.debug(
+            "Request to get filtered Products with criteria: minPrice={}, maxPrice={}, categoryIds={}, minRating={}",
+            minPrice,
+            maxPrice,
+            categoryIds,
+            minRating
+        );
+        return productRepository.findFilteredProducts(pageable, minPrice, maxPrice, categoryIds, minRating);
     }
 
     /**

@@ -3,475 +3,252 @@ description: Rules to provide additional context about JHipster Generated Projec
 globs: 
 alwaysApply: false
 ---
-This is a full-stack application with a production-ready project structure. It is a Monolithic Application, using JWT authentication with an SQL Database (MySQL), currently only usinh H2 (running in-memory) for the development database. The Java application uses Maven while the frontend uses a React framework to support the backend.
+This is a JHipster-generated monolithic application using JWT authentication and an SQL database. JHipster follows standard project structure and conventions for full-stack development.
 
-Frontend code is located in the "src/main/webapp" directory
+- *Frontend code** is located in the `src/main/webapp` directory
+- *Backend code** is located in the `src/main` directory
+- *Typical JHipster Project Structure:**
 
-Backend code is located in the "src/main" directory (with its deployment directory)
+```
 
-This is a JHipster-generated monolithic application using JWT authentication and an SQL database (MySQL for production, H2 in-memory for development).  The project uses a standard JHipster project structure.
+[project-name]
 
-**Project Structure:**
+├── .cursor/
 
-test-jhipster-full
-├── .cursor
-│   └── rules
-│       └── jhipster-context.mdc
-├── .devcontainer
-│   ├── Dockerfile
-│   └── devcontainer.json
+├── .devcontainer/
+
+├── .github/
+
+├── .husky/                  # Git hooks
+
+├── .mvn/                    # Maven wrapper
+
+├── node_modules/
+
+├── src/
+
+│   ├── main/
+
+│   │   ├── docker/          # Docker configurations
+
+│   │   ├── java/            # Backend source code
+
+│   │   ├── resources/       # Backend resources & configuration
+
+│   │   └── webapp/          # Frontend source code
+
+│   └── test/
+
+│       ├── java/            # Backend tests
+
+│       ├── javascript/      # Frontend tests
+
+│       │   └── cypress/     # E2E tests
+
+│       ├── gatling/         # Performance tests (if enabled)
+
+│       └── resources/       # Test resources
+
+├── target/                  # Build output
+
+├── webpack/                 # Webpack configuration
+
 ├── .editorconfig
+
 ├── .gitattributes
+
 ├── .gitignore
-├── .husky
-│   ├── _
-│   │   ├── .gitignore
-│   │   ├── applypatch-msg
-│   │   ├── commit-msg
-│   │   ├── h
-│   │   ├── husky.sh
-│   │   ├── post-applypatch
-│   │   ├── post-checkout
-│   │   ├── post-commit
-│   │   ├── post-merge
-│   │   ├── post-rewrite
-│   │   ├── pre-applypatch
-│   │   ├── pre-auto-gc
-│   │   ├── pre-commit
-│   │   ├── pre-merge-commit
-│   │   ├── pre-push
-│   │   ├── pre-rebase
-│   │   └── prepare-commit-msg
-│   └── pre-commit
+
 ├── .lintstagedrc.cjs
-├── .mvn
-│   ├── jvm.config
-│   └── wrapper
-│       ├── maven-wrapper.jar
-│       └── maven-wrapper.properties
+
 ├── .prettierignore
+
 ├── .prettierrc
-├── .yo-rc.json
+
+├── .yo-rc.json             # JHipster configuration
+
 ├── README.md
+
 ├── checkstyle.xml
+
+├── cypress-audits.config.ts (if Cypress enabled)
+
+├── cypress.config.ts       (if Cypress enabled)
+
 ├── eslint.config.mjs
+
+├── [project-name].jdl      # JDL entity definitions (if used)
+
 ├── jest.conf.js
-├── mvnw
-├── mvnw.cmd
-├── npmw
-├── npmw.cmd
+
+├── mvnw / mvnw.cmd         # Maven wrapper
+
+├── npmw / npmw.cmd         # NPM wrapper
+
 ├── package-lock.json
+
 ├── package.json
+
 ├── pom.xml
+
 ├── postcss.config.js
+
 ├── sonar-project.properties
-├── src
-│   ├── main
-│   │   ├── docker
-│   │   │   ├── app.yml
-│   │   │   ├── config
-│   │   │   │   └── mysql
-│   │   │   │       └── my.cnf
-│   │   │   ├── grafana
-│   │   │   │   └── provisioning
-│   │   │   │       ├── dashboards
-│   │   │   │       │   ├── JVM.json
-│   │   │   │       │   └── dashboard.yml
-│   │   │   │       └── datasources
-│   │   │   │           └── datasource.yml
-│   │   │   ├── jhipster-control-center.yml
-│   │   │   ├── jib
-│   │   │   │   └── entrypoint.sh
-│   │   │   ├── monitoring.yml
-│   │   │   ├── mysql.yml
-│   │   │   ├── prometheus
-│   │   │   │   └── prometheus.yml
-│   │   │   ├── services.yml
-│   │   │   └── sonar.yml
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── mycompany
-│   │   │           └── myapp
-│   │   │               ├── ApplicationWebXml.java
-│   │   │               ├── GeneratedByJHipster.java
-│   │   │               ├── TestJhipster2App.java
-│   │   │               ├── aop
-│   │   │               │   └── logging
-│   │   │               │       ├── LoggingAspect.java
-│   │   │               │       └── package-info.java
-│   │   │               ├── config
-│   │   │               │   ├── ApplicationProperties.java
-│   │   │               │   ├── AsyncConfiguration.java
-│   │   │               │   ├── CRLFLogConverter.java
-│   │   │               │   ├── CacheConfiguration.java
-│   │   │               │   ├── Constants.java
-│   │   │               │   ├── DatabaseConfiguration.java
-│   │   │               │   ├── DateTimeFormatConfiguration.java
-│   │   │               │   ├── JacksonConfiguration.java
-│   │   │               │   ├── LiquibaseConfiguration.java
-│   │   │               │   ├── LoggingAspectConfiguration.java
-│   │   │               │   ├── LoggingConfiguration.java
-│   │   │               │   ├── SecurityConfiguration.java
-│   │   │               │   ├── SecurityJwtConfiguration.java
-│   │   │               │   ├── StaticResourcesWebConfiguration.java
-│   │   │               │   ├── WebConfigurer.java
-│   │   │               │   └── package-info.java
-│   │   │               ├── domain
-│   │   │               │   ├── AbstractAuditingEntity.java
-│   │   │               │   ├── Authority.java
-│   │   │               │   ├── User.java
-│   │   │               │   └── package-info.java
-│   │   │               ├── management
-│   │   │               │   ├── SecurityMetersService.java
-│   │   │               │   └── package-info.java
-│   │   │               ├── package-info.java
-│   │   │               ├── repository
-│   │   │               │   ├── AuthorityRepository.java
-│   │   │               │   ├── UserRepository.java
-│   │   │               │   └── package-info.java
-│   │   │               ├── security
-│   │   │               │   ├── AuthoritiesConstants.java
-│   │   │               │   ├── DomainUserDetailsService.java
-│   │   │               │   ├── SecurityUtils.java
-│   │   │               │   ├── SpringSecurityAuditorAware.java
-│   │   │               │   ├── UserNotActivatedException.java
-│   │   │               │   └── package-info.java
-│   │   │               ├── service
-│   │   │               │   ├── EmailAlreadyUsedException.java
-│   │   │               │   ├── InvalidPasswordException.java
-│   │   │               │   ├── MailService.java
-│   │   │               │   ├── UserService.java
-│   │   │               │   ├── UsernameAlreadyUsedException.java
-│   │   │               │   ├── dto
-│   │   │               │   │   ├── AdminUserDTO.java
-│   │   │               │   │   ├── PasswordChangeDTO.java
-│   │   │               │   │   ├── UserDTO.java
-│   │   │               │   │   └── package-info.java
-│   │   │               │   ├── mapper
-│   │   │               │   │   ├── UserMapper.java
-│   │   │               │   │   └── package-info.java
-│   │   │               │   └── package-info.java
-│   │   │               └── web
-│   │   │                   ├── filter
-│   │   │                   │   ├── SpaWebFilter.java
-│   │   │                   │   └── package-info.java
-│   │   │                   └── rest
-│   │   │                       ├── AccountResource.java
-│   │   │                       ├── AuthenticateController.java
-│   │   │                       ├── AuthorityResource.java
-│   │   │                       ├── PublicUserResource.java
-│   │   │                       ├── UserResource.java
-│   │   │                       ├── errors
-│   │   │                       │   ├── BadRequestAlertException.java
-│   │   │                       │   ├── EmailAlreadyUsedException.java
-│   │   │                       │   ├── ErrorConstants.java
-│   │   │                       │   ├── ExceptionTranslator.java
-│   │   │                       │   ├── FieldErrorVM.java
-│   │   │                       │   ├── InvalidPasswordException.java
-│   │   │                       │   ├── LoginAlreadyUsedException.java
-│   │   │                       │   └── package-info.java
-│   │   │                       ├── package-info.java
-│   │   │                       └── vm
-│   │   │                           ├── KeyAndPasswordVM.java
-│   │   │                           ├── LoginVM.java
-│   │   │                           ├── ManagedUserVM.java
-│   │   │                           └── package-info.java
-│   │   ├── resources
-│   │   │   ├── .h2.server.properties
-│   │   │   ├── banner.txt
-│   │   │   ├── config
-│   │   │   │   ├── application-dev.yml
-│   │   │   │   ├── application-prod.yml
-│   │   │   │   ├── application-tls.yml
-│   │   │   │   ├── application.yml
-│   │   │   │   ├── liquibase
-│   │   │   │   │   ├── changelog
-│   │   │   │   │   │   └── 00000000000000_initial_schema.xml
-│   │   │   │   │   ├── data
-│   │   │   │   │   │   ├── authority.csv
-│   │   │   │   │   │   ├── user.csv
-│   │   │   │   │   │   └── user_authority.csv
-│   │   │   │   │   └── master.xml
-│   │   │   │   └── tls
-│   │   │   │       └── keystore.p12
-│   │   │   ├── i18n
-│   │   │   │   └── messages.properties
-│   │   │   ├── logback-spring.xml
-│   │   │   └── templates
-│   │   │       ├── error.html
-│   │   │       └── mail
-│   │   │           ├── activationEmail.html
-│   │   │           ├── creationEmail.html
-│   │   │           └── passwordResetEmail.html
-│   │   └── webapp
-│   │       ├── 404.html
-│   │       ├── WEB-INF
-│   │       │   └── web.xml
-│   │       ├── app
-│   │       │   ├── _bootstrap-variables.scss
-│   │       │   ├── app.scss
-│   │       │   ├── app.tsx
-│   │       │   ├── config
-│   │       │   │   ├── axios-interceptor.spec.ts
-│   │       │   │   ├── axios-interceptor.ts
-│   │       │   │   ├── constants.ts
-│   │       │   │   ├── dayjs.ts
-│   │       │   │   ├── error-middleware.ts
-│   │       │   │   ├── icon-loader.ts
-│   │       │   │   ├── logger-middleware.ts
-│   │       │   │   ├── notification-middleware.spec.ts
-│   │       │   │   ├── notification-middleware.ts
-│   │       │   │   └── store.ts
-│   │       │   ├── entities
-│   │       │   │   ├── menu.tsx
-│   │       │   │   ├── reducers.ts
-│   │       │   │   └── routes.tsx
-│   │       │   ├── index.tsx
-│   │       │   ├── modules
-│   │       │   │   ├── account
-│   │       │   │   │   ├── activate
-│   │       │   │   │   │   ├── activate.reducer.spec.ts
-│   │       │   │   │   │   ├── activate.reducer.ts
-│   │       │   │   │   │   └── activate.tsx
-│   │       │   │   │   ├── index.tsx
-│   │       │   │   │   ├── password
-│   │       │   │   │   │   ├── password.reducer.spec.ts
-│   │       │   │   │   │   ├── password.reducer.ts
-│   │       │   │   │   │   └── password.tsx
-│   │       │   │   │   ├── password-reset
-│   │       │   │   │   │   ├── finish
-│   │       │   │   │   │   │   └── password-reset-finish.tsx
-│   │       │   │   │   │   ├── init
-│   │       │   │   │   │   │   └── password-reset-init.tsx
-│   │       │   │   │   │   └── password-reset.reducer.ts
-│   │       │   │   │   ├── register
-│   │       │   │   │   │   ├── register.reducer.spec.ts
-│   │       │   │   │   │   ├── register.reducer.ts
-│   │       │   │   │   │   └── register.tsx
-│   │       │   │   │   └── settings
-│   │       │   │   │       ├── settings.reducer.spec.ts
-│   │       │   │   │       ├── settings.reducer.ts
-│   │       │   │   │       └── settings.tsx
-│   │       │   │   ├── administration
-│   │       │   │   │   ├── administration.reducer.spec.ts
-│   │       │   │   │   ├── administration.reducer.ts
-│   │       │   │   │   ├── configuration
-│   │       │   │   │   │   └── configuration.tsx
-│   │       │   │   │   ├── docs
-│   │       │   │   │   │   ├── docs.scss
-│   │       │   │   │   │   └── docs.tsx
-│   │       │   │   │   ├── health
-│   │       │   │   │   │   ├── health-modal.tsx
-│   │       │   │   │   │   └── health.tsx
-│   │       │   │   │   ├── index.tsx
-│   │       │   │   │   ├── logs
-│   │       │   │   │   │   └── logs.tsx
-│   │       │   │   │   ├── metrics
-│   │       │   │   │   │   └── metrics.tsx
-│   │       │   │   │   └── user-management
-│   │       │   │   │       ├── index.tsx
-│   │       │   │   │       ├── user-management-delete-dialog.tsx
-│   │       │   │   │       ├── user-management-detail.tsx
-│   │       │   │   │       ├── user-management-update.tsx
-│   │       │   │   │       ├── user-management.reducer.spec.ts
-│   │       │   │   │       ├── user-management.reducer.ts
-│   │       │   │   │       └── user-management.tsx
-│   │       │   │   ├── home
-│   │       │   │   │   ├── home.scss
-│   │       │   │   │   └── home.tsx
-│   │       │   │   └── login
-│   │       │   │       ├── login-modal.tsx
-│   │       │   │       ├── login.tsx
-│   │       │   │       └── logout.tsx
-│   │       │   ├── routes.tsx
-│   │       │   ├── setup-tests.ts
-│   │       │   ├── shared
-│   │       │   │   ├── DurationFormat.tsx
-│   │       │   │   ├── auth
-│   │       │   │   │   ├── private-route.spec.tsx
-│   │       │   │   │   └── private-route.tsx
-│   │       │   │   ├── error
-│   │       │   │   │   ├── error-boundary-routes.spec.tsx
-│   │       │   │   │   ├── error-boundary-routes.tsx
-│   │       │   │   │   ├── error-boundary.spec.tsx
-│   │       │   │   │   ├── error-boundary.tsx
-│   │       │   │   │   └── page-not-found.tsx
-│   │       │   │   ├── jhipster
-│   │       │   │   │   ├── headers.ts
-│   │       │   │   │   └── problem-details.ts
-│   │       │   │   ├── layout
-│   │       │   │   │   ├── footer
-│   │       │   │   │   │   ├── footer.scss
-│   │       │   │   │   │   └── footer.tsx
-│   │       │   │   │   ├── header
-│   │       │   │   │   │   ├── header-components.tsx
-│   │       │   │   │   │   ├── header.scss
-│   │       │   │   │   │   ├── header.spec.tsx
-│   │       │   │   │   │   └── header.tsx
-│   │       │   │   │   ├── menus
-│   │       │   │   │   │   ├── account.spec.tsx
-│   │       │   │   │   │   ├── account.tsx
-│   │       │   │   │   │   ├── admin.tsx
-│   │       │   │   │   │   ├── entities.tsx
-│   │       │   │   │   │   ├── index.ts
-│   │       │   │   │   │   ├── menu-components.tsx
-│   │       │   │   │   │   └── menu-item.tsx
-│   │       │   │   │   └── password
-│   │       │   │   │       ├── password-strength-bar.scss
-│   │       │   │   │       └── password-strength-bar.tsx
-│   │       │   │   ├── model
-│   │       │   │   │   └── user.model.ts
-│   │       │   │   ├── reducers
-│   │       │   │   │   ├── application-profile.spec.ts
-│   │       │   │   │   ├── application-profile.ts
-│   │       │   │   │   ├── authentication.spec.ts
-│   │       │   │   │   ├── authentication.ts
-│   │       │   │   │   ├── index.ts
-│   │       │   │   │   └── reducer.utils.ts
-│   │       │   │   └── util
-│   │       │   │       ├── date-utils.ts
-│   │       │   │       ├── entity-utils.spec.ts
-│   │       │   │       ├── entity-utils.ts
-│   │       │   │       └── pagination.constants.ts
-│   │       │   └── typings.d.ts
-│   │       ├── content
-│   │       │   ├── css
-│   │       │   │   └── loading.css
-│   │       │   └── images
-│   │       │       ├── jhipster_family_member_0.svg
-│   │       │       ├── jhipster_family_member_0_head-192.png
-│   │       │       ├── jhipster_family_member_0_head-256.png
-│   │       │       ├── jhipster_family_member_0_head-384.png
-│   │       │       ├── jhipster_family_member_0_head-512.png
-│   │       │       ├── jhipster_family_member_1.svg
-│   │       │       ├── jhipster_family_member_1_head-192.png
-│   │       │       ├── jhipster_family_member_1_head-256.png
-│   │       │       ├── jhipster_family_member_1_head-384.png
-│   │       │       ├── jhipster_family_member_1_head-512.png
-│   │       │       ├── jhipster_family_member_2.svg
-│   │       │       ├── jhipster_family_member_2_head-192.png
-│   │       │       ├── jhipster_family_member_2_head-256.png
-│   │       │       ├── jhipster_family_member_2_head-384.png
-│   │       │       ├── jhipster_family_member_2_head-512.png
-│   │       │       ├── jhipster_family_member_3.svg
-│   │       │       ├── jhipster_family_member_3_head-192.png
-│   │       │       ├── jhipster_family_member_3_head-256.png
-│   │       │       ├── jhipster_family_member_3_head-384.png
-│   │       │       ├── jhipster_family_member_3_head-512.png
-│   │       │       └── logo-jhipster.png
-│   │       ├── favicon.ico
-│   │       ├── index.html
-│   │       ├── manifest.webapp
-│   │       ├── robots.txt
-│   │       └── swagger-ui
-│   │           └── index.html
-│   └── test
-│       ├── java
-│       │   └── com
-│       │       └── mycompany
-│       │           └── myapp
-│       │               ├── IntegrationTest.java
-│       │               ├── TechnicalStructureTest.java
-│       │               ├── config
-│       │               │   ├── AsyncSyncConfiguration.java
-│       │               │   ├── CRLFLogConverterTest.java
-│       │               │   ├── EmbeddedSQL.java
-│       │               │   ├── MysqlTestContainer.java
-│       │               │   ├── SpringBootTestClassOrderer.java
-│       │               │   ├── SqlTestContainer.java
-│       │               │   ├── SqlTestContainersSpringContextCustomizerFactory.java
-│       │               │   ├── StaticResourcesWebConfigurerTest.java
-│       │               │   ├── WebConfigurerTest.java
-│       │               │   ├── WebConfigurerTestController.java
-│       │               │   └── timezone
-│       │               │       └── HibernateTimeZoneIT.java
-│       │               ├── domain
-│       │               │   ├── AssertUtils.java
-│       │               │   ├── AuthorityAsserts.java
-│       │               │   ├── AuthorityTest.java
-│       │               │   └── AuthorityTestSamples.java
-│       │               ├── management
-│       │               │   └── SecurityMetersServiceTests.java
-│       │               ├── repository
-│       │               │   └── timezone
-│       │               │       ├── DateTimeWrapper.java
-│       │               │       └── DateTimeWrapperRepository.java
-│       │               ├── security
-│       │               │   ├── DomainUserDetailsServiceIT.java
-│       │               │   ├── SecurityUtilsUnitTest.java
-│       │               │   └── jwt
-│       │               │       ├── AuthenticationIntegrationTest.java
-│       │               │       ├── JwtAuthenticationTestUtils.java
-│       │               │       ├── TokenAuthenticationIT.java
-│       │               │       └── TokenAuthenticationSecurityMetersIT.java
-│       │               ├── service
-│       │               │   ├── MailServiceIT.java
-│       │               │   ├── UserServiceIT.java
-│       │               │   └── mapper
-│       │               │       └── UserMapperTest.java
-│       │               └── web
-│       │                   ├── filter
-│       │                   │   └── SpaWebFilterIT.java
-│       │                   └── rest
-│       │                       ├── AccountResourceIT.java
-│       │                       ├── AuthenticateControllerIT.java
-│       │                       ├── AuthorityResourceIT.java
-│       │                       ├── PublicUserResourceIT.java
-│       │                       ├── TestUtil.java
-│       │                       ├── UserResourceIT.java
-│       │                       ├── WithUnauthenticatedMockUser.java
-│       │                       └── errors
-│       │                           ├── ExceptionTranslatorIT.java
-│       │                           └── ExceptionTranslatorTestController.java
-│       └── resources
-│           ├── META-INF
-│           │   └── spring.factories
-│           ├── config
-│           │   ├── application-testdev.yml
-│           │   ├── application-testprod.yml
-│           │   └── application.yml
-│           ├── i18n
-│           │   └── messages_en.properties
-│           ├── junit-platform.properties
-│           ├── logback.xml
-│           └── templates
-│               └── mail
-│                   ├── activationEmail.html
-│                   ├── creationEmail.html
-│                   ├── passwordResetEmail.html
-│                   └── testEmail.html
+
 ├── tsconfig.json
-├── tsconfig.test.json
-└── webpack
-    ├── environment.js
-    ├── logo-jhipster.png
-    ├── utils.js
-    ├── webpack.common.js
-    ├── webpack.dev.js
-    └── webpack.prod.js
 
+└── tsconfig.test.json
 
-**Data Model (Example - VERY IMPORTANT):**
+```
 
-*   **Entities:**
-    *   `User`:  (Already exists in JHipster) Fields: `id`, `login`, `passwordHash`, `firstName`, `lastName`, `email`, `activated`, `langKey`, `imageUrl`, `activationKey`, `resetKey`, `resetDate`.
-    *   `Product`:  Fields: `id` (Long, generated), `name` (String, required), `description` (String), `price` (BigDecimal, required, min value 0), `inStock` (Boolean, required).
-    *   `Category`: Fields: `id` (Long, generated), `name` (String, required, unique).
-*   **Relationships:**
-    *   Many-to-One: `Product` belongs to one `Category`.
+- *Technologies & Versions (JHipster 8.x+):**
+- *Backend:**
+- Java 17+
+- Spring Boot 3.x
+- JHipster Framework 8.x
+- Maven (build tool)
+- Undertow (web server, not Tomcat)
+- Spring Security (with JWT)
+- Spring Data JPA
+- Liquibase (database versioning)
+- MapStruct (mapping framework)
+- SpringDoc OpenAPI (API documentation)
+- *Frontend:**
+- React 18.x
+- TypeScript 5.x
+- Redux Toolkit 2.x
+- React Router 7.x
+- Bootstrap 5.x / Reactstrap 9.x
+- Webpack 5.x
+- Sass
+- Node.js 22.x+
+- npm 11.x+
+- *Database Options:**
+- MySQL / PostgreSQL / MariaDB (Production)
+- H2 (Development - in-memory)
+- HikariCP (connection pooling)
+- *Testing Frameworks & Tools:**
+- *Backend Testing:**
+- JUnit 5 (Jupiter) - Primary testing framework
+- Spring Boot Test
+- TestNG (optional) - Additional testing framework
+- ArchUnit - Architecture testing
+- Cucumber (optional) - BDD testing
+- Gatling (optional) - Performance testing
+- Testcontainers - Integration testing with real databases
+- Mockito (included with Spring Boot Test)
+- *Frontend Testing:**
+- Jest - Unit testing framework
+- Testing Library React - Component testing utilities
+- Cypress (optional) - E2E testing framework
+- cypress-audit (optional) - Accessibility and performance auditing
+- jest-environment-jsdom - DOM environment for Jest
+- redux-mock-store - Redux store mocking
+- Sinon - Test spies, stubs and mocks
+- *Code Quality & Linting:**
+- ESLint (with TypeScript ESLint)
+- Prettier
+- Checkstyle
+- SonarQube integration
+- Husky (Git hooks)
+- lint-staged
+- *Development Tools:**
+- Browser Sync
+- Webpack Dev Server
+- Concurrently (parallel task execution)
+- wait-on (service readiness checking)
+- *Docker & Deployment:**
+- Jib Maven Plugin (containerization)
+- Docker Compose configurations
+- Monitoring with Grafana & Prometheus (optional)
+- *Authentication:**
+- JWT (JSON Web Token)
+- Spring Security OAuth2 Resource Server
+- *Key Configuration Files:**
+- `jest.conf.js` - Jest testing configuration
+- `cypress.config.ts` - Cypress E2E testing configuration (if enabled)
+- `cypress-audits.config.ts` - Cypress audits configuration (if enabled)
+- `eslint.config.mjs` - ESLint configuration with TypeScript support
+- `pom.xml` - Maven build configuration
+- `package.json` - Node.js dependencies and scripts
+- `.yo-rc.json` - JHipster generator configuration
+- *Test Structure:**
+- *Backend Tests:** `src/test/java/`
+- Unit tests (naming: `*Test.java`)
+- Integration tests (naming: `*IT.java`)
+- Architecture tests (ArchUnit)
+- Security tests
+- Repository tests with Testcontainers
+- *Frontend Tests:** `src/main/webapp/app/`
+- Unit tests (naming: `*.spec.ts` or `*.spec.tsx`)
+- Component tests with Testing Library
+- Redux reducer tests
+- *E2E Tests:** `src/test/javascript/cypress/` (if enabled)
+- Cypress E2E tests (naming: `*.cy.ts`)
+- Accessibility audits with cypress-audit
+- *Performance Tests:** `src/test/gatling/` (if enabled)
+- Gatling performance test scenarios
+- *Standard JHipster Entities:**
+- **User Entity** (Always present):
 
-**Technologies:**
+*   Fields: `id`, `login`, `passwordHash`, `firstName`, `lastName`, `email`, `activated`, `langKey`, `imageUrl`, `activationKey`, `resetKey`, `resetDate`
 
-*   **Backend:** Java, Spring Boot
-*   **Frontend:** React, JavaScript (or TypeScript)
-*   **Database:** MySQL (Production), H2 (Development).
-*   **Build Tool:** Maven.
-*   **Authentication:** JWT (JSON Web Token).
+*   Managed by JHipster's user management system
 
-**API (Example):**
+- **Authority Entity** (Always present):
 
-*   `/api/products`:  REST endpoints for managing products (CRUD operations).
-*   `/api/categories`: REST endpoints for managing categories.
-*   `/api/authenticate`:  Endpoint for user login and JWT generation.
-* `/api/account`: Endpoint for retrieving and managing user details
+*   Fields: `name`
 
+*   Defines user roles (e.g., ROLE_USER, ROLE_ADMIN)
+
+- **Custom Entities** (Project-specific):
+
+*   Defined in JDL files or through JHipster entity generator
+
+*   Can have various field types: String, Integer, Long, BigDecimal, Boolean, LocalDate, Instant, etc.
+
+*   Support for relationships: OneToOne, OneToMany, ManyToOne, ManyToMany
+
+- *Standard API Endpoints:**
+- *Authentication & User Management:**
+- `/api/authenticate` - User login and JWT generation
+- `/api/account` - Current user account management
+- `/api/admin/users` - User administration (admin only)
+- `/api/authorities` - Available authorities/roles
+- *Actuator Endpoints (Management):**
+- `/management/health` - Application health check
+- `/management/info` - Application information
+- `/management/metrics` - Application metrics
+- `/management/configprops` - Configuration properties
+- *Custom Entity Endpoints:**
+- `/api/[entity-name]` - CRUD operations for custom entities
+- Follows REST conventions (GET, POST, PUT, DELETE)
+- *Development Commands:**
+- *Backend:**
+- `./mvnw` - Start backend server
+- `./mvnw test` - Run backend unit tests
+- `./mvnw verify` - Run all backend tests including integration tests
+- `./mvnw spring-boot:run` - Start backend in development mode
+- *Frontend:**
+- `npm start` - Start frontend development server
+- `npm test` - Run Jest unit tests
+- `npm run e2e` - Run Cypress E2E tests (if enabled)
+- `npm run lint` - Run ESLint
+- `npm run prettier:format` - Format code with Prettier
+- *Full Stack:**
+- `npm run watch` - Start both frontend and backend in watch mode
+- *Database:**
+- `npm run docker:db:up` - Start database in Docker
+- `npm run docker:db:down` - Stop database Docker container
+- *JHipster Generator Commands:**
+- `jhipster entity [EntityName]` - Generate new entity
+- `jhipster` - Regenerate application
+- `jhipster upgrade` - Upgrade JHipster version
+- *Common JHipster Conventions:**
+- REST controllers in `src/main/java/[package]/web/rest/`
+- Services in `src/main/java/[package]/service/`
+- Repositories in `src/main/java/[package]/repository/`
+- Domain entities in `src/main/java/[package]/domain/`
+- DTOs in `src/main/java/[package]/service/dto/`
+- Frontend components follow feature-based organization
+- Tests mirror the source code structure

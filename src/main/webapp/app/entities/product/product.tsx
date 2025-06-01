@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
+import { Button, Row, Col, Card, CardBody, CardImg, CardTitle, CardText, Badge, Container, Alert } from 'reactstrap';
 import { JhiItemCount, JhiPagination, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { faSort, faSortDown, faSortUp, faStar, faEye, faEdit, faTrash, faPlus, faSync } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-import { getEntities } from './product.reducer';
+import { getEntities, getFilteredEntities, setFilters, clearFilters, IProductFilters } from './product.reducer';
+import ProductFilter from './product-filter';
 
 export const Product = () => {
   const dispatch = useAppDispatch();
@@ -20,18 +21,31 @@ export const Product = () => {
     overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
-  const productList = useAppSelector(state => state.product.entities);
-  const loading = useAppSelector(state => state.product.loading);
-  const totalItems = useAppSelector(state => state.product.totalItems);
+  const productState = useAppSelector(state => state.product);
+  const { entities: productList, filteredEntities, isFiltering, loading, totalItems, filteredTotalItems, filters } = productState;
+
+  const currentProducts = isFiltering ? filteredEntities : productList;
+  const currentTotalItems = isFiltering ? filteredTotalItems : totalItems;
 
   const getAllEntities = () => {
-    dispatch(
-      getEntities({
-        page: paginationState.activePage - 1,
-        size: paginationState.itemsPerPage,
-        sort: `${paginationState.sort},${paginationState.order}`,
-      }),
-    );
+    if (isFiltering && Object.keys(filters).length > 0) {
+      dispatch(
+        getFilteredEntities({
+          page: paginationState.activePage - 1,
+          size: paginationState.itemsPerPage,
+          sort: `${paginationState.sort},${paginationState.order}`,
+          filters,
+        }),
+      );
+    } else {
+      dispatch(
+        getEntities({
+          page: paginationState.activePage - 1,
+          size: paginationState.itemsPerPage,
+          sort: `${paginationState.sort},${paginationState.order}`,
+        }),
+      );
+    }
   };
 
   const sortEntities = () => {
@@ -44,7 +58,7 @@ export const Product = () => {
 
   useEffect(() => {
     sortEntities();
-  }, [paginationState.activePage, paginationState.order, paginationState.sort]);
+  }, [paginationState.activePage, paginationState.order, paginationState.sort, filters]);
 
   useEffect(() => {
     const params = new URLSearchParams(pageLocation.search);
@@ -79,6 +93,48 @@ export const Product = () => {
     sortEntities();
   };
 
+  const handleFiltersChange = (newFilters: IProductFilters) => {
+    dispatch(setFilters(newFilters));
+    setPaginationState({
+      ...paginationState,
+      activePage: 1,
+    });
+
+    if (Object.keys(newFilters).length > 0) {
+      dispatch(
+        getFilteredEntities({
+          page: 0,
+          size: paginationState.itemsPerPage,
+          sort: `${paginationState.sort},${paginationState.order}`,
+          filters: newFilters,
+        }),
+      );
+    } else {
+      dispatch(
+        getEntities({
+          page: 0,
+          size: paginationState.itemsPerPage,
+          sort: `${paginationState.sort},${paginationState.order}`,
+        }),
+      );
+    }
+  };
+
+  const handleClearFilters = () => {
+    dispatch(clearFilters());
+    setPaginationState({
+      ...paginationState,
+      activePage: 1,
+    });
+    dispatch(
+      getEntities({
+        page: 0,
+        size: paginationState.itemsPerPage,
+        sort: `${paginationState.sort},${paginationState.order}`,
+      }),
+    );
+  };
+
   const getSortIconByFieldName = (fieldName: string) => {
     const sortFieldName = paginationState.sort;
     const order = paginationState.order;
@@ -88,120 +144,168 @@ export const Product = () => {
     return order === ASC ? faSortUp : faSortDown;
   };
 
-  return (
-    <div>
-      <h2 id="product-heading" data-cy="ProductHeading">
-        Products
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} /> Refresh list
-          </Button>
-          <Link to="/product/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp; Create a new Product
-          </Link>
-        </div>
-      </h2>
-      <div className="table-responsive">
-        {productList && productList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  ID <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('name')}>
-                  Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
-                </th>
-                <th className="hand" onClick={sort('description')}>
-                  Description <FontAwesomeIcon icon={getSortIconByFieldName('description')} />
-                </th>
-                <th className="hand" onClick={sort('price')}>
-                  Price <FontAwesomeIcon icon={getSortIconByFieldName('price')} />
-                </th>
-                <th className="hand" onClick={sort('imageUrl')}>
-                  Image Url <FontAwesomeIcon icon={getSortIconByFieldName('imageUrl')} />
-                </th>
-                <th className="hand" onClick={sort('rating')}>
-                  Rating <FontAwesomeIcon icon={getSortIconByFieldName('rating')} />
-                </th>
-                <th>
-                  Category <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
-                  User <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {productList.map((product, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/product/${product.id}`} color="link" size="sm">
-                      {product.id}
-                    </Button>
-                  </td>
-                  <td>{product.name}</td>
-                  <td>{product.description}</td>
-                  <td>{product.price}</td>
-                  <td>{product.imageUrl}</td>
-                  <td>{product.rating}</td>
-                  <td>{product.category ? <Link to={`/category/${product.category.id}`}>{product.category.name}</Link> : ''}</td>
-                  <td>{product.user ? product.user.login : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/product/${product.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" /> <span className="d-none d-md-inline">View</span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/product/${product.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" /> <span className="d-none d-md-inline">Edit</span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/product/${product.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" /> <span className="d-none d-md-inline">Delete</span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && <div className="alert alert-warning">No Products found</div>
-        )}
+  const renderStarRating = (rating: number) => {
+    return (
+      <div className="d-flex align-items-center">
+        {[1, 2, 3, 4, 5].map(star => (
+          <FontAwesomeIcon key={star} icon={faStar} className={`me-1 ${star <= rating ? 'text-warning' : 'text-muted'}`} size="sm" />
+        ))}
+        <span className="ms-1 small text-muted">({rating})</span>
       </div>
-      {totalItems ? (
-        <div className={productList && productList.length > 0 ? '' : 'd-none'}>
-          <div className="justify-content-center d-flex">
-            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} />
+    );
+  };
+
+  const renderProductCard = (product, index) => (
+    <Col lg={4} md={6} sm={12} key={`entity-${index}`} className="mb-4">
+      <Card className="h-100 shadow-sm product-card" data-cy="entityTable">
+        {product.imageUrl && <CardImg top src={product.imageUrl} alt={product.name} style={{ height: '200px', objectFit: 'cover' }} />}
+        <CardBody className="d-flex flex-column">
+          <div className="flex-grow-1">
+            <CardTitle tag="h5" className="mb-2">
+              <Link to={`/product/${product.id}`} className="text-decoration-none">
+                {product.name}
+              </Link>
+            </CardTitle>
+            <CardText className="text-muted small mb-2" style={{ minHeight: '3rem' }}>
+              {product.description}
+            </CardText>
+            <div className="mb-2">
+              <Badge color="info" className="me-2">
+                {product.category ? product.category.name : 'No Category'}
+              </Badge>
+              <Badge color="secondary">{product.user ? product.user.login : 'Unknown'}</Badge>
+            </div>
+            <div className="mb-2">{renderStarRating(product.rating || 0)}</div>
           </div>
-          <div className="justify-content-center d-flex">
-            <JhiPagination
-              activePage={paginationState.activePage}
-              onSelect={handlePagination}
-              maxButtons={5}
-              itemsPerPage={paginationState.itemsPerPage}
-              totalItems={totalItems}
-            />
+          <div className="mt-auto">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h4 className="text-primary mb-0">${product.price}</h4>
+            </div>
+            <div className="btn-group w-100" role="group">
+              <Button tag={Link} to={`/product/${product.id}`} color="info" size="sm" data-cy="entityDetailsButton" className="flex-fill">
+                <FontAwesomeIcon icon={faEye} /> View
+              </Button>
+              <Button
+                tag={Link}
+                to={`/product/${product.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                color="primary"
+                size="sm"
+                data-cy="entityEditButton"
+                className="flex-fill"
+              >
+                <FontAwesomeIcon icon={faEdit} /> Edit
+              </Button>
+              <Button
+                onClick={() =>
+                  (window.location.href = `/product/${product.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                }
+                color="danger"
+                size="sm"
+                data-cy="entityDeleteButton"
+                className="flex-fill"
+              >
+                <FontAwesomeIcon icon={faTrash} /> Delete
+              </Button>
+            </div>
           </div>
-        </div>
-      ) : (
-        ''
-      )}
-    </div>
+        </CardBody>
+      </Card>
+    </Col>
+  );
+
+  return (
+    <Container fluid>
+      <Row>
+        {/* Filter Sidebar */}
+        <Col lg={3} md={4} className="mb-4">
+          <ProductFilter
+            onFiltersChange={handleFiltersChange}
+            onClearFilters={handleClearFilters}
+            currentFilters={filters}
+            productsCount={currentTotalItems}
+          />
+        </Col>
+
+        {/* Main Content */}
+        <Col lg={9} md={8}>
+          {/* Header */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 id="product-heading" data-cy="ProductHeading" className="mb-1">
+                Products
+              </h2>
+              <p className="text-muted mb-0">
+                {isFiltering ? 'Filtered results' : 'All products'}
+                {currentTotalItems > 0 && ` (${currentTotalItems} total)`}
+              </p>
+            </div>
+            <div className="d-flex gap-2">
+              <Button color="info" onClick={handleSyncList} disabled={loading} size="sm">
+                <FontAwesomeIcon icon={faSync} spin={loading} /> Refresh
+              </Button>
+              <Button tag={Link} to="/product/new" color="primary" id="jh-create-entity" data-cy="entityCreateButton" size="sm">
+                <FontAwesomeIcon icon={faPlus} /> New Product
+              </Button>
+            </div>
+          </div>
+
+          {/* Sort Controls */}
+          <div className="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+            <span className="small text-muted">Sort by:</span>
+            <div className="btn-group btn-group-sm" role="group">
+              <Button color={paginationState.sort === 'name' ? 'primary' : 'outline-secondary'} onClick={sort('name')} size="sm">
+                Name <FontAwesomeIcon icon={getSortIconByFieldName('name')} />
+              </Button>
+              <Button color={paginationState.sort === 'price' ? 'primary' : 'outline-secondary'} onClick={sort('price')} size="sm">
+                Price <FontAwesomeIcon icon={getSortIconByFieldName('price')} />
+              </Button>
+              <Button color={paginationState.sort === 'rating' ? 'primary' : 'outline-secondary'} onClick={sort('rating')} size="sm">
+                Rating <FontAwesomeIcon icon={getSortIconByFieldName('rating')} />
+              </Button>
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          {currentProducts && currentProducts.length > 0 ? (
+            <Row>{currentProducts.map((product, i) => renderProductCard(product, i))}</Row>
+          ) : (
+            !loading && (
+              <Alert color="warning" className="text-center">
+                <FontAwesomeIcon icon="exclamation-triangle" className="me-2" />
+                {isFiltering ? 'No products match the selected filters' : 'No Products found'}
+                {isFiltering && (
+                  <div className="mt-2">
+                    <Button color="link" onClick={handleClearFilters} className="p-0">
+                      Clear all filters to see all products
+                    </Button>
+                  </div>
+                )}
+              </Alert>
+            )
+          )}
+
+          {/* Pagination */}
+          {currentTotalItems ? (
+            <div className={currentProducts && currentProducts.length > 0 ? 'mt-4' : 'd-none'}>
+              <div className="justify-content-center d-flex">
+                <JhiItemCount page={paginationState.activePage} total={currentTotalItems} itemsPerPage={paginationState.itemsPerPage} />
+              </div>
+              <div className="justify-content-center d-flex">
+                <JhiPagination
+                  activePage={paginationState.activePage}
+                  onSelect={handlePagination}
+                  maxButtons={5}
+                  itemsPerPage={paginationState.itemsPerPage}
+                  totalItems={currentTotalItems}
+                />
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

@@ -6,6 +6,7 @@ import com.mycompany.myapp.service.ProductService;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -154,6 +155,47 @@ public class ProductResource {
         } else {
             page = productService.findAll(pageable);
         }
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+
+    /**
+     * {@code GET  /products/filter} : get filtered products based on criteria.
+     *
+     * @param pageable the pagination information.
+     * @param minPrice the minimum price filter.
+     * @param maxPrice the maximum price filter.
+     * @param categoryIds the category IDs to filter by (comma-separated).
+     * @param minRating the minimum rating filter.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of filtered products in body.
+     */
+    @GetMapping("/filter")
+    public ResponseEntity<List<Product>> getFilteredProducts(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "minPrice", required = false) BigDecimal minPrice,
+        @RequestParam(name = "maxPrice", required = false) BigDecimal maxPrice,
+        @RequestParam(name = "categoryIds", required = false) String categoryIds,
+        @RequestParam(name = "minRating", required = false) Double minRating
+    ) {
+        LOG.debug(
+            "REST request to get filtered Products with criteria: minPrice={}, maxPrice={}, categoryIds={}, minRating={}",
+            minPrice,
+            maxPrice,
+            categoryIds,
+            minRating
+        );
+
+        // Parse category IDs
+        List<Long> categoryIdList = null;
+        if (categoryIds != null && !categoryIds.trim().isEmpty()) {
+            try {
+                categoryIdList = List.of(categoryIds.split(",")).stream().map(String::trim).map(Long::valueOf).toList();
+            } catch (NumberFormatException e) {
+                throw new BadRequestAlertException("Invalid category IDs format", ENTITY_NAME, "invalidcategoryids");
+            }
+        }
+
+        Page<Product> page = productService.findFilteredProducts(pageable, minPrice, maxPrice, categoryIdList, minRating);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }

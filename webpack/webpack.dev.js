@@ -101,9 +101,10 @@ module.exports = async options =>
           reload: false,
         },
       ),
-      new WebpackNotifierPlugin({
-        title: 'Faceted Product Filter',
-        contentImage: path.join(__dirname, 'logo-jhipster.png'),
-      }),
+      // Disabled WebpackNotifierPlugin to avoid ENAMETOOLONG error on Windows
+      // new WebpackNotifierPlugin({
+      //   title: 'Faceted Product Filter',
+      //   contentImage: path.join(__dirname, 'logo-jhipster.png'),
+      // }),
     ].filter(Boolean),
   });

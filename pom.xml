@@ -20,6 +20,7 @@
     <properties>
         <!--
             Build properties
+            hhgg
             The spring-boot version should match the one managed by https://mvnrepository.com/artifact/tech.jhipster/jhipster-dependencies/${jhipster-dependencies.version}
         -->
         <maven.version>3.2.5</maven.version>
